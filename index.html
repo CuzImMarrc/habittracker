@@ -16,7 +16,7 @@
 :root{
   /* Layout: eine schmale App-Spalte (max 560px), Habit-Karten untereinander, schwebender Hinzufügen-Button unten rechts, Bottom-Sheets für Details/Bearbeiten */
   --bg:#F1F4EE; --surface:#FDFEFB; --raise:#F4F7F1; --ink:#1C2820; --muted:#5D6B61; --line:#D7DED2; --soft:#E4EADF; --sel-track:#3A4A3F;
-  --accent:#C7386B; --flame:#DD6F22; --on-fill:#FFFFFF; --danger:#B3261E; --on-danger:#FFFFFF;
+  --accent:#C7386B; --flame:#DD6F22; --flame-soft:#FCEBDD; --flame-line:#F0CDB0; --on-fill:#FFFFFF; --danger:#B3261E; --on-danger:#FFFFFF;
   --h-peony:#CF4378; --h-marigold:#CC8510; --h-leaf:#3B8C53; --h-iris:#6657C6; --h-sky:#2A7BBB; --h-coral:#D4573A;
   --scrim:rgba(20,30,23,.42);
   --shadow:0 1px 2px rgba(28,40,32,.06),0 6px 18px rgba(28,40,32,.06);
@@ -28,7 +28,7 @@
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --bg:#0F1511; --surface:#18201A; --raise:#1F2822; --ink:#E5ECE3; --muted:#95A398; --line:#2A352D; --soft:#263129; --sel-track:#B9C4B7;
-    --accent:#EF6F9B; --flame:#FF9A55; --on-fill:#0F1511; --danger:#F08A80; --on-danger:#1B0E0D;
+    --accent:#EF6F9B; --flame:#FF9A55; --flame-soft:#2A1F17; --flame-line:#46331F; --on-fill:#0F1511; --danger:#F08A80; --on-danger:#1B0E0D;
     --h-peony:#EF6F9B; --h-marigold:#EDB23F; --h-leaf:#5DBE7A; --h-iris:#9C91F2; --h-sky:#5BABE6; --h-coral:#F07E5C;
     --scrim:rgba(0,0,0,.6);
     --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.22);
@@ -38,7 +38,7 @@
 }
 :root[data-theme="dark"]{
   --bg:#0F1511; --surface:#18201A; --raise:#1F2822; --ink:#E5ECE3; --muted:#95A398; --line:#2A352D; --soft:#263129; --sel-track:#B9C4B7;
-  --accent:#EF6F9B; --flame:#FF9A55; --on-fill:#0F1511; --danger:#F08A80; --on-danger:#1B0E0D;
+  --accent:#EF6F9B; --flame:#FF9A55; --flame-soft:#2A1F17; --flame-line:#46331F; --on-fill:#0F1511; --danger:#F08A80; --on-danger:#1B0E0D;
   --h-peony:#EF6F9B; --h-marigold:#EDB23F; --h-leaf:#5DBE7A; --h-iris:#9C91F2; --h-sky:#5BABE6; --h-coral:#F07E5C;
   --scrim:rgba(0,0,0,.6);
   --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.22);
@@ -78,6 +78,22 @@ h1{font-family:var(--font-display);font-weight:400;font-size:2.5rem;line-height:
 .ring-label{position:absolute;inset:0;display:grid;place-items:center;font-weight:700;font-size:1.1rem;font-variant-numeric:tabular-nums}
 .ring-label small{font-size:.75rem;color:var(--muted);font-weight:600}
 .ring-label .blossom{width:34px;height:34px;color:var(--accent)}
+
+/* Gesamt-Serie */
+.combo{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--radius);background:var(--flame-soft)}
+.combo-flame{width:52px;height:52px;flex:none;border-radius:50%;background:var(--surface);color:var(--flame);display:grid;place-items:center;transition:background-color .25s ease,color .25s ease}
+.combo-flame svg{width:30px;height:30px}
+.combo.lit .combo-flame{background:var(--flame);color:var(--on-fill)}
+.combo.zero .combo-flame{color:var(--muted)}
+.combo.zero .combo-flame svg{opacity:.5}
+.combo-flame.pop{animation:flare .6s cubic-bezier(.3,1.4,.5,1)}
+.combo-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.combo-num{display:flex;align-items:baseline;flex-wrap:wrap;gap:0 7px;font-weight:600}
+.combo-num b{font-family:var(--font-display);font-weight:400;font-size:2rem;line-height:1;font-variant-numeric:tabular-nums}
+.combo-sub{margin:0;font-size:.86rem;color:var(--muted)}
+.combo-best{flex:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding-left:14px;border-left:1px solid var(--flame-line)}
+.combo-best b{font-family:var(--font-display);font-weight:400;font-size:1.35rem;line-height:1;font-variant-numeric:tabular-nums}
+.combo-best span{font-size:.68rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 
 /* Tagesleiste */
 .days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
@@ -232,6 +248,7 @@ h1{font-family:var(--font-display);font-weight:400;font-size:2.5rem;line-height:
 
 @keyframes bloom{0%{transform:scale(.3) rotate(-50deg);opacity:0}60%{transform:scale(1.15) rotate(8deg);opacity:1}100%{transform:none;opacity:1}}
 @keyframes thump{50%{transform:scale(1.1)}}
+@keyframes flare{0%{transform:scale(.7)}55%{transform:scale(1.18) rotate(-6deg)}100%{transform:none}}
 @keyframes rise{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
 @keyframes fade{from{opacity:0}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
@@ -258,6 +275,16 @@ h1{font-family:var(--font-display);font-weight:400;font-size:2.5rem;line-height:
       <svg class="ring" viewBox="0 0 80 80"><circle class="ring-trk" cx="40" cy="40" r="33"/><circle class="ring-val" id="ringVal" cx="40" cy="40" r="33" transform="rotate(-90 40 40)" style="stroke-dashoffset:207.3"/></svg>
       <div class="ring-label" id="ringLabel"></div>
     </div>
+  </section>
+
+  <section class="combo" id="combo" hidden>
+    <span class="combo-flame" id="comboFlame" aria-hidden="true"></span>
+    <div class="combo-text">
+      <p class="eyebrow">Alle Ziele geschafft</p>
+      <div class="combo-num" id="comboNum"></div>
+      <p class="combo-sub" id="comboSub"></p>
+    </div>
+    <div class="combo-best" id="comboBest"><b id="comboBestNum"></b><span>Rekord</span></div>
   </section>
 
   <nav class="days" id="dayStrip" aria-label="Tag auswählen"></nav>
@@ -396,7 +423,10 @@ function sampleState(){
   set('ex-lesen',10,0);
   for (let a = 0; a <= 13; a++) set('ex-vitamine',a,1);
   set('ex-vitamine',14,0);
-  set('ex-spazieren',0,1); set('ex-spazieren',1,0);
+  set('ex-spazieren',0,1);
+  // Die letzten 3 Tage alles geschafft, davor eine Lücke: Gesamt-Serie 3
+  for (let a = 1; a <= 3; a++) habits.forEach(h => set(h.id, a, h.type === 'count' ? 8 : 1));
+  set('ex-spazieren',4,0);
   return {v:1, habits, log, sample:true};
 }
 
@@ -440,6 +470,30 @@ function rate30(h){
 }
 const allDone = n => state.habits.length > 0 && state.habits.every(h => done(h,n));
 const doneCount = n => state.habits.filter(h => done(h,n)).length;
+
+// Gesamt-Serie: Tage in Folge, an denen alle Habits geschafft wurden.
+// Zählt nur Habits, die an dem Tag schon existiert haben. Ein neu angelegtes Habit macht die Serie also nicht kaputt.
+function perfect(n){
+  let any = false;
+  for (const h of state.habits){
+    if (numOf(h.created) > n) continue;
+    any = true;
+    if (!done(h,n)) return false;
+  }
+  return any;
+}
+function comboStreak(){
+  const todayDone = perfect(todayNum);
+  let n = todayDone ? todayNum : todayNum - 1, c = 0;
+  while (perfect(n)){ c++; n--; }
+  return {count:c, todayDone};
+}
+function comboBest(){
+  if (!state.habits.length) return 0;
+  let n = Math.min(...state.habits.map(h => numOf(h.created))), best = 0, cur = 0;
+  for (; n <= todayNum; n++){ cur = perfect(n) ? cur + 1 : 0; if (cur > best) best = cur; }
+  return best;
+}
 const newId = () => 'h' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 const typeHint = t => t === 'count'
   ? 'Für Sachen in Schritten, z. B. 8 Gläser Wasser: jedes Glas einzeln antippen.'
@@ -457,6 +511,25 @@ function renderHeader(){
   const frac = tot ? d / tot : 0;
   $('#ringVal').style.strokeDashoffset = (207.3 * (1 - frac)).toFixed(1);
   $('#ringLabel').innerHTML = all ? BLOSSOM : `<span>${d}<small>/${tot}</small></span>`;
+}
+
+let lastCombo = null;
+function renderCombo(){
+  const box = $('#combo');
+  box.hidden = state.habits.length === 0;
+  if (box.hidden){ lastCombo = null; return; }
+  const s = comboStreak(), c = s.count, best = Math.max(comboBest(), c);
+  box.className = 'combo' + (s.todayDone ? ' lit' : c === 0 ? ' zero' : '');
+  $('#comboNum').innerHTML = `<b>${c}</b>${c === 1 ? 'Tag' : 'Tage'} in Folge`;
+  $('#comboSub').textContent = s.todayDone
+    ? (c === 1 ? 'Heute alles geschafft. Der Anfang ist gemacht!' : 'Heute auch alles geschafft. Weiter so!')
+    : c > 0 ? `Schaff heute alles, dann sind es ${c + 1}.`
+    : 'Schaff heute alles, dann startet deine Serie.';
+  $('#comboBestNum').textContent = best;
+  $('#comboBest').hidden = best === 0;
+  const flame = $('#comboFlame');
+  if (lastCombo !== null && c > lastCombo){ flame.classList.remove('pop'); void flame.offsetWidth; flame.classList.add('pop'); }
+  lastCombo = c;
 }
 
 function renderDays(){
@@ -512,7 +585,7 @@ function renderBanners(){
   $('#sampleBanner').hidden = !state.sample;
   $('#storageBanner').hidden = storageOk;
 }
-function renderAll(){ renderHeader(); renderDays(); renderList(); renderBanners(); }
+function renderAll(){ renderHeader(); renderCombo(); renderDays(); renderList(); renderBanners(); }
 
 /* ---------- Sheets ---------- */
 const head = (title, sub) => `<div class="sheet-head"><div class="sheet-titles"><h2 id="sheetTitle">${title}</h2>${sub ? `<p class="sheet-sub">${sub}</p>` : ''}</div>`
@@ -595,7 +668,7 @@ function settingsHTML(){
     + `</section>`
     + (state.sample ? `<section class="set"><h3 class="section-label">Beispiel-Habits</h3><p>Die fünf Beispiele haben einen ausgedachten Verlauf, damit man sieht, wie alles aussieht.</p><div class="actions"><button class="btn" type="button" data-act="clear-sample">Beispiele entfernen</button></div></section>` : '')
     + `<section class="set"><h3 class="section-label">Neu anfangen</h3><p>Löscht alle Habits und den kompletten Verlauf auf diesem Gerät.</p><div class="actions"><button class="btn danger" type="button" data-act="reset">Alle Daten löschen</button></div></section>`
-    + `<p class="foot">Habit-Tracker · Version 0.1 · ${state.habits.length} ${state.habits.length === 1 ? 'Habit' : 'Habits'}</p>`;
+    + `<p class="foot">Habit-Tracker · Version 0.2 · ${state.habits.length} ${state.habits.length === 1 ? 'Habit' : 'Habits'}</p>`;
 }
 
 function renderSheet(){
@@ -653,7 +726,10 @@ function commit(id, act, bloomed, wasAll){
     if (bloomed) b.classList.add('pop');
   }
   if (bloomed) buzz();
-  if (!wasAll && allDone(selNum)) toast(selNum === todayNum ? 'Alles erledigt für heute. Stark!' : 'Für diesen Tag ist jetzt alles nachgetragen.');
+  if (!wasAll && allDone(selNum)){
+    if (selNum === todayNum){ const c = comboStreak().count; toast(c > 1 ? `Alles erledigt! ${c} Tage in Folge.` : 'Alles erledigt für heute. Stark!'); }
+    else toast('Für diesen Tag ist jetzt alles nachgetragen.');
+  }
 }
 function toggle(id){
   const h = find(id); if (!h) return;
@@ -838,6 +914,7 @@ setInterval(checkNewDay, 60000);
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); } catch(e){}
 
 document.querySelector('.logo').innerHTML = BLOSSOM;
+$('#comboFlame').innerHTML = FLAME;
 document.querySelector('.logo-big').innerHTML = BLOSSOM;
 renderAll();
 })();
