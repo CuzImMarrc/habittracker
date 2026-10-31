@@ -472,26 +472,44 @@ const allDone = n => state.habits.length > 0 && state.habits.every(h => done(h,n
 const doneCount = n => state.habits.filter(h => done(h,n)).length;
 
 // Gesamt-Serie: Tage in Folge, an denen alle Habits geschafft wurden.
-// Zählt nur Habits, die an dem Tag schon existiert haben. Ein neu angelegtes Habit macht die Serie also nicht kaputt.
-function perfect(n){
+// Ab wann zählt ein Habit mit?
+// - Habits vom ersten Tag: ab dem frühesten Eintrag überhaupt, also auch nachgetragene Tage von davor.
+// - Später angelegte Habits: ab ihrem Anlegetag (oder ihrem ersten Eintrag, falls nachgetragen).
+//   So macht ein neues Habit die bisherige Serie nicht kaputt.
+function activeSince(){
+  const first = {};
+  let firstCreated = Infinity, appStart = Infinity;
+  for (const h of state.habits){
+    const c = numOf(h.created);
+    let f = c;
+    for (const k in (state.log[h.id] || {})){ const n = numOf(k); if (n < f) f = n; }
+    first[h.id] = f;
+    if (c < firstCreated) firstCreated = c;
+    if (f < appStart) appStart = f;
+  }
+  const since = {};
+  for (const h of state.habits) since[h.id] = numOf(h.created) <= firstCreated ? appStart : first[h.id];
+  return since;
+}
+function perfect(n, since){
   let any = false;
   for (const h of state.habits){
-    if (numOf(h.created) > n) continue;
+    if (since[h.id] > n) continue;
     any = true;
     if (!done(h,n)) return false;
   }
   return any;
 }
-function comboStreak(){
-  const todayDone = perfect(todayNum);
+function comboStreak(since = activeSince()){
+  const todayDone = perfect(todayNum, since);
   let n = todayDone ? todayNum : todayNum - 1, c = 0;
-  while (perfect(n)){ c++; n--; }
+  while (perfect(n, since)){ c++; n--; }
   return {count:c, todayDone};
 }
-function comboBest(){
+function comboBest(since = activeSince()){
   if (!state.habits.length) return 0;
-  let n = Math.min(...state.habits.map(h => numOf(h.created))), best = 0, cur = 0;
-  for (; n <= todayNum; n++){ cur = perfect(n) ? cur + 1 : 0; if (cur > best) best = cur; }
+  let n = Math.min(...Object.values(since)), best = 0, cur = 0;
+  for (; n <= todayNum; n++){ cur = perfect(n, since) ? cur + 1 : 0; if (cur > best) best = cur; }
   return best;
 }
 const newId = () => 'h' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
@@ -518,7 +536,7 @@ function renderCombo(){
   const box = $('#combo');
   box.hidden = state.habits.length === 0;
   if (box.hidden){ lastCombo = null; return; }
-  const s = comboStreak(), c = s.count, best = Math.max(comboBest(), c);
+  const since = activeSince(), s = comboStreak(since), c = s.count, best = Math.max(comboBest(since), c);
   box.className = 'combo' + (s.todayDone ? ' lit' : c === 0 ? ' zero' : '');
   $('#comboNum').innerHTML = `<b>${c}</b>${c === 1 ? 'Tag' : 'Tage'} in Folge`;
   $('#comboSub').textContent = s.todayDone
@@ -668,7 +686,7 @@ function settingsHTML(){
     + `</section>`
     + (state.sample ? `<section class="set"><h3 class="section-label">Beispiel-Habits</h3><p>Die fünf Beispiele haben einen ausgedachten Verlauf, damit man sieht, wie alles aussieht.</p><div class="actions"><button class="btn" type="button" data-act="clear-sample">Beispiele entfernen</button></div></section>` : '')
     + `<section class="set"><h3 class="section-label">Neu anfangen</h3><p>Löscht alle Habits und den kompletten Verlauf auf diesem Gerät.</p><div class="actions"><button class="btn danger" type="button" data-act="reset">Alle Daten löschen</button></div></section>`
-    + `<p class="foot">Habit-Tracker · Version 0.2 · ${state.habits.length} ${state.habits.length === 1 ? 'Habit' : 'Habits'}</p>`;
+    + `<p class="foot">Habit-Tracker · Version 0.3 · ${state.habits.length} ${state.habits.length === 1 ? 'Habit' : 'Habits'}</p>`;
 }
 
 function renderSheet(){
